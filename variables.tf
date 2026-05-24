@@ -13,7 +13,6 @@ variable "airflow_log_port" {
   default = 8793
 }
 
-
 variable "airflow_cpu" {
   default = 512
 }
