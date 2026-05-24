@@ -3,19 +3,7 @@ variable "aws_region" {
   description = "Default region"
 }
 
-variable "dockerhub_username" {
-  type        = string
-  description = "Docker Hub username"
-  sensitive   = true
-}
-
-variable "dockerhub_token" {
-  type        = string
-  description = "Docker Hub token"
-  sensitive   = true
-}
-
-variable "pipout_bucket_name" { type = string }
+variable "pipeout_bucket_name" { type = string }
 
 variable "airflow_ui_port" {
   type        = string
@@ -56,15 +44,15 @@ variable "model_training_image" {
   type = string
 }
 
-variable "feature_engeneering_cpu" {
+variable "feature_engineering_cpu" {
   default = 256
 }
 
-variable "feature_engeneering_memory" {
+variable "feature_engineering_memory" {
   default = 512
 }
 
-variable "feature_engeneering_image" {
+variable "feature_engineering_image" {
   type = string
 }
 

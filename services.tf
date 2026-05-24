@@ -1,7 +1,7 @@
 resource "aws_ecs_service" "airflow" {
   name            = "airflow"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_task_definition.airflow.arn
+  task_definition = aws_ecs_task_definition.airflow.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
@@ -17,7 +17,7 @@ resource "aws_ecs_service" "airflow" {
 resource "aws_ecs_service" "mlflow" {
   name            = "mlflow"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_task_definition.mlflow.arn
+  task_definition = aws_ecs_task_definition.mlflow.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 

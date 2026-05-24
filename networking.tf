@@ -48,7 +48,7 @@ resource "aws_vpc_security_group_ingress_rule" "airflow_ui" {
   security_group_id = aws_security_group.airflow.id
   from_port         = var.airflow_ui_port
   to_port           = var.airflow_ui_port
-  protocol          = "tcp"
+  ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
@@ -56,7 +56,7 @@ resource "aws_vpc_security_group_ingress_rule" "airflow_log" {
   security_group_id = aws_security_group.airflow.id
   from_port         = var.airflow_log_port
   to_port           = var.airflow_log_port
-  protocol          = "tcp"
+  ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
@@ -64,7 +64,7 @@ resource "aws_vpc_security_group_egress_rule" "airflow" {
   security_group_id = aws_security_group.airflow.id
   from_port         = 0
   to_port           = 0
-  protocol          = "-1"
+  ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
@@ -80,7 +80,7 @@ resource "aws_vpc_security_group_ingress_rule" "mlflow" {
   security_group_id = aws_security_group.mlflow.id
   from_port         = var.mlflow_port
   to_port           = var.mlflow_port
-  protocol          = "tcp"
+  ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
@@ -88,7 +88,7 @@ resource "aws_vpc_security_group_egress_rule" "mlflow" {
   security_group_id = aws_security_group.mlflow.id
   from_port         = 0
   to_port           = 0
-  protocol          = "-1"
+  ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
@@ -104,6 +104,6 @@ resource "aws_vpc_security_group_egress_rule" "ephemeral" {
   security_group_id = aws_security_group.ephemeral.id
   from_port         = 0
   to_port           = 0
-  protocol          = "-1"
+  ip_protocol       = "-1"
   cidr_ipv4         = "0.0.0.0/0"
 }

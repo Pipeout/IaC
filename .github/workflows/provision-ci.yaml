@@ -15,6 +15,11 @@ jobs:
 
     env:
       aws_region: $ {{ secrets.TF_VAR_AWS_REGION}}
+      feature_engineering_image: $ {{ secrets.TF_VAR_FEATURE_ENGINEERING_IMAGE}}
+      airflow_image: $ {{ secrets.TF_VAR_AIRFLOW_IMAGE}}
+      mlflow_image: $ {{ secrets.TF_VAR_MLFLOW_IMAGE}}
+      model_training_image: $ {{ secrets.TF_VAR_MODEL_TRAINING_IMAGE}}
+      pipeout_bucket_name: ${{secrets.TF_VAR_PIPEOUT_BUCKET_NAME}}
 
     steps:
       - name: Checkout
