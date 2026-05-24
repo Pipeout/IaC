@@ -5,7 +5,7 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = var.pipeout_bucket_name
+    bucket = "pipeout-database"
     key    = "infra/terraform.tfstate"
     region = "us-east-1"
   }
