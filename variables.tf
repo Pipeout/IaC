@@ -6,17 +6,11 @@ variable "aws_region" {
 variable "pipeout_bucket_name" { type = string }
 
 variable "airflow_ui_port" {
-  type        = string
-  description = "UI port for airflow"
-  sensitive   = true
-  default     = 8080
+  default = 8080
 }
 
 variable "airflow_log_port" {
-  type        = string
-  description = "API port for airflow"
-  sensitive   = true
-  default     = 8793
+  default = 8793
 }
 
 
