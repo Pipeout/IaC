@@ -24,7 +24,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Setup Terraform
-        uses: opentofu/setup-tofu@v1
+        uses: opentofu/setup-opentofu@v1
 
       - name: Terraform Init
         run: tofu init
