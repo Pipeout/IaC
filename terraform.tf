@@ -1,12 +1,10 @@
 terraform {
-  required_version = ">= 1.5.0"
-
-  backend "s3" {}
 
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.92"
+      source  = "opentofu/aws"
+      version = "6.46.0"
     }
   }
+  required_version = ">= 1.11.6"
 }

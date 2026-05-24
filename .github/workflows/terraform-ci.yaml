@@ -1,0 +1,86 @@
+# # .github/workflows/terraform.yml
+# name: Terraform
+
+# on:
+#   push:
+#     branches: [main] # apply on merge to main
+#   pull_request: # plan on PR
+#   workflow_dispatch: # manual trigger (for destroy)
+#     inputs:
+#       action:
+#         description: "apply or destroy"
+#         required: true
+#         default: "apply"
+
+# env:
+#   TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+#   TF_VAR_dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+#   TF_VAR_dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+# jobs:
+#   terraform:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+
+#       - name: Setup Terraform
+#         uses: hashicorp/setup-terraform@v3
+
+#       - name: Terraform Init
+#         run: terraform init
+
+#       - name: Terraform Plan# .github/workflows/terraform-ci.yaml
+#         run: terraform plan
+
+#     on:
+#         push:
+#           branches: [main]        # apply on merge to main
+#         pull_request:             # plan on PR
+#         workflow_dispatch:        # manual trigger (for destroy)
+#           inputs:
+#             action:
+#               description: 'apply or destroy'
+#               required: true
+#               default: 'apply'
+#       jobs:
+#         terraform:
+#           runs-on: ubuntu-latest
+
+#           steps:
+#             - name: Checkout
+#               uses: actions/checkout@v4
+
+#             - name: Configure AWS credentials
+#               uses: aws-actions/configure-aws-credentials@v4
+#               # with:
+#               #   aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+#               #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#               #   aws-region:            ${{ vars.AWS_REGION }}
+
+#             - name: Setup Terraform
+#               uses: hashicorp/setup-terraform@v3
+
+#             - name: Terraform Init
+#               run: terraform init
+
+#             - name: Terraform Plan
+#               run: terraform plan
+
+#             - name: Terraform Apply
+#               if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#               run: terraform apply -auto-approve
+
+#             - name: Terraform Destroy
+#               if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+#               run: terraform destroy -auto-approve
+#         run: terraform plan
+
+#       - name: Terraform Apply
+#         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#         run: terraform apply -auto-approve
+
+#       - name: Terraform Destroy
+#         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+#         run: terraform destroy -auto-approve
