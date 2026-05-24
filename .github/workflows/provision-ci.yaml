@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      aws_region: $ {{ secrets.TF_VAR_AWS_REGION}}
-      feature_engineering_image: $ {{ secrets.TF_VAR_FEATURE_ENGINEERING_IMAGE}}
-      airflow_image: $ {{ secrets.TF_VAR_AIRFLOW_IMAGE}}
-      mlflow_image: $ {{ secrets.TF_VAR_MLFLOW_IMAGE}}
-      model_training_image: $ {{ secrets.TF_VAR_MODEL_TRAINING_IMAGE}}
-      pipeout_bucket_name: ${{secrets.TF_VAR_PIPEOUT_BUCKET_NAME}}
+      TF_VAR_aws_region: ${{ secrets.TF_VAR_AWS_REGION }}
+      TF_VAR_pipeout_bucket_name: ${{ secrets.TF_VAR_PIPEOUT_BUCKET_NAME }}
+      TF_VAR_airflow_image: ${{ secrets.TF_VAR_AIRFLOW_IMAGE }}
+      TF_VAR_model_training_image: ${{ secrets.TF_VAR_MODEL_TRAINING_IMAGE }}
+      TF_VAR_feature_engineering_image: ${{ secrets.TF_VAR_FEATURE_ENGINEERING_IMAGE }}
+      TF_VAR_mlflow_image: ${{ secrets.TF_VAR_MLFLOW_IMAGE }}
 
     steps:
       - name: Checkout
@@ -38,7 +38,7 @@ jobs:
         run: tofu init
 
       - name: Terraform Plan
-        run: tofu plan
+        run: tofu plan -input=false
 
       - name: Terraform Apply
-        run: tofu apply -auto-approve
+        run: tofu apply -input=false -auto-approve
