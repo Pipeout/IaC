@@ -13,6 +13,9 @@ jobs:
   tofu:
     runs-on: ubuntu-latest
 
+    env:
+      aws_region: $ {{ secrets.TF_VAR_AWS_REGION}}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,7 +24,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.ARN_ROLE }}
-          aws-region: us-east-1
+          aws-region: ${{ secrets.TF_VAR_AWS_REGION }}
 
       - name: Setup Terraform
         uses: opentofu/setup-opentofu@v1
