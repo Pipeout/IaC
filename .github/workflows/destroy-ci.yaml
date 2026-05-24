@@ -28,11 +28,11 @@ jobs:
           role-to-assume: ${{ secrets.ARN_ROLE }}
           aws-region: us-east-1
 
-      - name: Setup Terraform
+      - name: Setup Tofu
         uses: opentofu/setup-opentofu@v1
 
-      - name: Terraform Init
+      - name: Tofu Init
         run: tofu init
 
-      - name: Terraform Destroy
+      - name: Tofu Destroy
         run: tofu destroy -input=false -auto-approve

@@ -31,14 +31,14 @@ jobs:
           role-to-assume: ${{ secrets.ARN_ROLE }}
           aws-region: ${{ secrets.TF_VAR_AWS_REGION }}
 
-      - name: Setup Terraform
+      - name: Setup Tofu
         uses: opentofu/setup-opentofu@v1
 
-      - name: Terraform Init
+      - name: Tofu Init
         run: tofu init
 
-      - name: Terraform Plan
+      - name: Tofu Plan
         run: tofu plan -input=false
 
-      - name: Terraform Apply
+      - name: Tofu Apply
         run: tofu apply -input=false -auto-approve
