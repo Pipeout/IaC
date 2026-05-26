@@ -36,14 +36,15 @@ resource "aws_lb_target_group" "airflow" {
   target_type = "ip" # required for Fargate
 
   health_check {
-    path                = "/api/v2/monitor/health"
+    path = "/"
+    # path                = "/api/v2/monitor/health"
     port                = var.airflow_ui_port
     protocol            = "HTTP"
     healthy_threshold   = 2
     unhealthy_threshold = 3
     interval            = 30
     timeout             = 5
-    matcher             = "200"
+    matcher             = "200-399"
   }
 
   tags = { Name = "airflow-tg" }

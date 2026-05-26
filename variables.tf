@@ -14,11 +14,11 @@ variable "airflow_log_port" {
 }
 
 variable "airflow_cpu" {
-  default = 512
+  default = 2048
 }
 
 variable "airflow_memory" {
-  default = 1024
+  default = 4096
 }
 
 variable "airflow_image" {
@@ -38,11 +38,11 @@ variable "model_training_image" {
 }
 
 variable "feature_engineering_cpu" {
-  default = 256
+  default = 2048
 }
 
 variable "feature_engineering_memory" {
-  default = 512
+  default = 4096
 }
 
 variable "feature_engineering_image" {
