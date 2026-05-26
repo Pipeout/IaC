@@ -1,6 +1,3 @@
-# outputs.tf
-
-# ECR URLs — CI/CD needs these to push images
 output "ecr_airflow_url" {
   value = aws_ecr_repository.airflow.repository_url
 }
@@ -17,12 +14,10 @@ output "ecr_feature_engineering_url" {
   value = aws_ecr_repository.feature_engineering.repository_url
 }
 
-# Cluster name — Airflow EcsRunTaskOperator needs this
 output "ecs_cluster_name" {
   value = aws_ecs_cluster.main.name
 }
 
-# Subnet and security group — Airflow needs these for network_configuration
 output "public_subnet_id" {
   value = aws_subnet.public_a.id
 }
