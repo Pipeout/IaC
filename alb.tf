@@ -1,6 +1,3 @@
-# ─────────────────────────────────────────
-# Security Group for the ALB
-# ─────────────────────────────────────────
 resource "aws_security_group" "alb" {
   name   = "alb-sg"
   vpc_id = aws_vpc.main.id
@@ -21,9 +18,6 @@ resource "aws_vpc_security_group_egress_rule" "alb" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-# ─────────────────────────────────────────
-# ALB
-# ─────────────────────────────────────────
 resource "aws_lb" "main" {
   name               = "main-alb"
   internal           = false
@@ -34,9 +28,6 @@ resource "aws_lb" "main" {
   tags = { Name = "main-alb" }
 }
 
-# ─────────────────────────────────────────
-# Target Groups
-# ─────────────────────────────────────────
 resource "aws_lb_target_group" "airflow" {
   name        = "airflow-tg"
   port        = var.airflow_ui_port
@@ -45,7 +36,7 @@ resource "aws_lb_target_group" "airflow" {
   target_type = "ip" # required for Fargate
 
   health_check {
-    path                = "/health"
+    path                = "/api/v2/monitor/health"
     port                = var.airflow_ui_port
     protocol            = "HTTP"
     healthy_threshold   = 2
@@ -79,41 +70,18 @@ resource "aws_lb_target_group" "mlflow" {
   tags = { Name = "mlflow-tg" }
 }
 
-# ─────────────────────────────────────────
-# Listener (port 80) + routing rules
-# ─────────────────────────────────────────
+
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
 
-  # Default action: return 404 if no rule matches
   default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Not found"
-      status_code  = "404"
-    }
-  }
-}
-
-# Route /airflow* → Airflow target group
-resource "aws_lb_listener_rule" "airflow" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 100
-
-  action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.airflow.arn
   }
-
-  condition {
-    path_pattern {
-      values = ["/airflow*", "/"]
-    }
-  }
 }
+
 
 # Route /mlflow* → MLflow target group
 resource "aws_lb_listener_rule" "mlflow" {
@@ -132,11 +100,8 @@ resource "aws_lb_listener_rule" "mlflow" {
   }
 }
 
-# ─────────────────────────────────────────
-# Outputs — your URLs after terraform apply
-# ─────────────────────────────────────────
 output "airflow_url" {
-  value = "http://${aws_lb.main.dns_name}/airflow"
+  value = "http://${aws_lb.main.dns_name}"
 }
 
 output "mlflow_url" {

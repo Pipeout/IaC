@@ -57,7 +57,7 @@ resource "aws_vpc_security_group_ingress_rule" "airflow_ui" {
   from_port                    = var.airflow_ui_port
   to_port                      = var.airflow_ui_port
   ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.alb.id # only ALB can reach Airflow
+  referenced_security_group_id = aws_security_group.alb.id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "airflow_log" {

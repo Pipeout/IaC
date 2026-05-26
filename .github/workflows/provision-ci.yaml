@@ -23,16 +23,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.ARN_ROLE }}
           aws-region: ${{ secrets.TF_VAR_AWS_REGION }}
 
       - name: Setup Tofu
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
+        with:
+          tofu_version: 1.11.6
 
       - name: Tofu Init
         run: tofu init
