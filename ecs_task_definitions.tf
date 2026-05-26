@@ -1,3 +1,5 @@
+
+
 resource "aws_ecs_task_definition" "airflow" {
   family                   = "airflow"
   requires_compatibilities = ["FARGATE"]
@@ -7,9 +9,8 @@ resource "aws_ecs_task_definition" "airflow" {
   execution_role_arn       = aws_iam_role.ecs_execution.arn
   container_definitions = jsonencode([
     {
-      name  = "airflow"
-      image = "${aws_ecr_repository.airflow.repository_url}:latest"
-
+      name      = "airflow"
+      image     = "${aws_ecr_repository.airflow.repository_url}:latest"
       essential = true
       portMappings = [
         { containerPort = var.airflow_ui_port },
@@ -38,7 +39,7 @@ resource "aws_ecs_task_definition" "model_training" {
     {
       name      = "model_training"
       image     = "${aws_ecr_repository.model_training.repository_url}:latest"
-      essencial = true
+      essential = true
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -62,7 +63,7 @@ resource "aws_ecs_task_definition" "feature_engineering" {
     {
       name      = "feature_engineering"
       image     = "${aws_ecr_repository.feature_engineering.repository_url}:latest"
-      essencial = true
+      essential = true
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -86,7 +87,10 @@ resource "aws_ecs_task_definition" "mlflow" {
     {
       name      = "mlflow"
       image     = "${aws_ecr_repository.mlflow.repository_url}:latest"
-      essencial = true
+      essential = true
+      portMappings = [
+        { containerPort = var.mlflow_port } # was missing entirely
+      ]
       logConfiguration = {
         logDriver = "awslogs"
         options = {

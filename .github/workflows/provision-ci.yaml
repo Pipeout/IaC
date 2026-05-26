@@ -42,3 +42,7 @@ jobs:
 
       - name: Tofu Apply
         run: tofu apply -input=false -auto-approve
+      - name: Print Load Balancer URL
+        run: |
+          echo "Airflow URL: $(tofu output -raw airflow_url)"
+          echo "MLflow URL:  $(tofu output -raw mlflow_url)"
