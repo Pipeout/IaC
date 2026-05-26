@@ -28,3 +28,57 @@ resource "aws_iam_role" "ecs_task" {
     }]
   })
 }
+
+
+resource "aws_iam_role" "airflow_task_role" {
+  name = "airflow-task-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy" "airflow_ecs_policy" {
+  name = "airflow-ecs-policy"
+  role = aws_iam_role.airflow_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect = "Allow"
+
+        Action = [
+          "ecs:RunTask",
+          "ecs:DescribeTasks",
+          "ecs:DescribeTaskDefinition"
+        ]
+
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+
+        Action = [
+          "iam:PassRole"
+        ]
+
+        Resource = "*"
+      }
+    ]
+  })
+}
