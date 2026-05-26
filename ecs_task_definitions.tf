@@ -12,6 +12,17 @@ resource "aws_ecs_task_definition" "airflow" {
       name      = "airflow"
       image     = "${aws_ecr_repository.airflow.repository_url}:latest"
       essential = true
+
+      environment = [
+        {
+          name  = "ECS_TARGET_SUBNETS"
+          value = join(",", [aws_subnet.public_a.id, aws_subnet.public_b.id])
+        },
+        {
+          name  = "ECS_TARGET_SECURITY_GROUPS"
+          value = aws_security_group.ephemeral.id
+        }
+      ]
       portMappings = [
         { containerPort = var.airflow_ui_port },
         { containerPort = var.airflow_log_port }
