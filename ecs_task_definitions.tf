@@ -124,6 +124,14 @@ resource "aws_ecs_task_definition" "mlflow" {
         {
           name  = "DEFAULT_ARTIFACT_ROOT"
           value = "s3://${var.pipeout_bucket_name}"
+        },
+        {
+          name  = "MLFLOW_SERVER_ALLOWED_HOSTS"
+          value = "*"
+        },
+        {
+          name  = "MLFLOW_SERVER_CORS_ALLOWED_ORIGINS"
+          value = "*"
         }
       ]
       portMappings = [
