@@ -89,7 +89,8 @@ resource "aws_iam_role_policy" "airflow_ecs_policy" {
         Action = "iam:PassRole"
         Resource = [
           aws_iam_role.ecs_execution.arn,
-          aws_iam_role.ecs_task.arn
+          aws_iam_role.ecs_task.arn,
+          aws_iam_role.feature_engineering_task_role.arn
         ]
       },
       {
@@ -129,7 +130,6 @@ resource "aws_iam_role_policy" "feature_engineering_s3_access" {
         Action = [
           "s3:ListBucket"
         ]
-        # Bucket-level permission
         Resource = [
           "arn:aws:s3:::${var.pipeout_bucket_name}"
         ]
@@ -139,7 +139,7 @@ resource "aws_iam_role_policy" "feature_engineering_s3_access" {
         Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject" # Include this if your script cleans up or drops old data
+          "s3:DeleteObject"
         ]
         Resource = [
           "arn:aws:s3:::${var.pipeout_bucket_name}/*"
