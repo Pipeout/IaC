@@ -111,6 +111,7 @@ resource "aws_ecs_task_definition" "mlflow" {
   cpu                      = var.mlflow_cpu
   memory                   = var.mlflow_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.mlflow_task_role.arn
   container_definitions = jsonencode([
     {
       name      = "mlflow"
@@ -118,9 +119,8 @@ resource "aws_ecs_task_definition" "mlflow" {
       essential = true
       environment = [
         {
-          name  = "BACKEND_STORE_URI"
-          value = "postgresql://${aws_db_instance.mlflow_db.username}:${aws_db_instance.mlflow_db.password}@${aws_db_instance.mlflow_db.endpoint}/${aws_db_instance.mlflow_db.db_name}"
-        },
+          name = "BACKEND_STORE_URI"
+        value = "postgresql://${aws_db_instance.mlflow_db.username}:${aws_db_instance.mlflow_db.password}@${aws_db_instance.mlflow_db.endpoint}/${aws_db_instance.mlflow_db.db_name}" },
         {
           name  = "DEFAULT_ARTIFACT_ROOT"
           value = "s3://${var.pipeout_bucket_name}"
@@ -135,7 +135,7 @@ resource "aws_ecs_task_definition" "mlflow" {
         }
       ]
       portMappings = [
-        { containerPort = var.mlflow_port } # was missing entirely
+        { containerPort = var.mlflow_port }
       ]
       logConfiguration = {
         logDriver = "awslogs"

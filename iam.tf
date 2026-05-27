@@ -191,3 +191,50 @@ resource "aws_iam_role_policy" "model_training_s3_access" {
     ]
   })
 }
+
+
+# 1. The Role itself (Allows ECS to wear the badge)
+resource "aws_iam_role" "mlflow_task_role" {
+  name = "mlflow-task-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+# 2. The Policy (Allows the badge to read/write to S3)
+resource "aws_iam_role_policy" "mlflow_s3_access" {
+  name = "mlflow-s3-access"
+  role = aws_iam_role.mlflow_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}

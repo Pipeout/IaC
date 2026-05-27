@@ -39,5 +39,5 @@ resource "aws_ecs_service" "mlflow" {
     container_port   = var.mlflow_port
   }
 
-  depends_on = [aws_lb_listener.http]
+  depends_on = [aws_lb_listener.mlflow_listener]
 }

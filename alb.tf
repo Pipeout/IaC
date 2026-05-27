@@ -128,3 +128,18 @@ resource "aws_lb_listener" "mlflow_listener" {
     target_group_arn = aws_lb_target_group.mlflow_tg.arn
   }
 }
+
+
+# Allow the new dedicated ALB to talk to the MLflow Fargate Container
+resource "aws_security_group_rule" "mlflow_alb_to_container" {
+  type      = "ingress"
+  from_port = 5000
+  to_port   = 5000
+  protocol  = "tcp"
+
+  # The Security Group attached to the MLflow Fargate Service
+  security_group_id = aws_security_group.mlflow.id
+
+  # The Security Group attached to the Dedicated MLflow ALB
+  source_security_group_id = aws_security_group.mlflow_alb_sg.id
+}
