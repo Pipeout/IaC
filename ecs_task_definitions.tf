@@ -54,6 +54,14 @@ resource "aws_ecs_task_definition" "model_training" {
         {
           name  = "MLFLOW_TRACKING_URI",
           value = "http://${aws_lb.main.dns_name}/mlflow"
+        },
+        {
+          name  = "ECS_TARGET_SUBNETS"
+          value = join(",", [aws_subnet.public_a.id, aws_subnet.public_b.id])
+        },
+        {
+          name  = "ECS_TARGET_SECURITY_GROUPS"
+          value = aws_security_group.ephemeral.id
         }
       ]
       name      = "model_training"
