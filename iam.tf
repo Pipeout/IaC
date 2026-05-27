@@ -1,3 +1,12 @@
+# ------------------------------------------------------------------------------
+# DATA SOURCES (Dynamic Account & Region for secure ARNs)
+# ------------------------------------------------------------------------------
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+# ------------------------------------------------------------------------------
+# 1. ECS EXECUTION ROLE (Required for Fargate to pull images & push logs)
+# ------------------------------------------------------------------------------
 resource "aws_iam_role" "ecs_execution" {
   name = "ecs-execution-role"
 
@@ -16,6 +25,9 @@ resource "aws_iam_role_policy_attachment" "ecs_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# ------------------------------------------------------------------------------
+# 2. CALLEE TASK ROLE (Permissions for the target container being spawned)
+# ------------------------------------------------------------------------------
 resource "aws_iam_role" "ecs_task" {
   name = "ecs-task-role"
 
@@ -29,55 +41,63 @@ resource "aws_iam_role" "ecs_task" {
   })
 }
 
-
+# ------------------------------------------------------------------------------
+# 3. AIRFLOW TASK ROLE (The Caller Container)
+# ------------------------------------------------------------------------------
 resource "aws_iam_role" "airflow_task_role" {
   name = "airflow-task-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-
-    Statement = [
-      {
-        Effect = "Allow"
-
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-
-        Action = "sts:AssumeRole"
-      }
-    ]
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
   })
 }
 
-
+# ------------------------------------------------------------------------------
+# 4. AIRFLOW OPERATOR POLICY (The Security Fix)
+# ------------------------------------------------------------------------------
 resource "aws_iam_role_policy" "airflow_ecs_policy" {
   name = "airflow-ecs-policy"
   role = aws_iam_role.airflow_task_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
-
     Statement = [
       {
         Effect = "Allow"
-
         Action = [
           "ecs:RunTask",
           "ecs:DescribeTasks",
-          "ecs:DescribeTaskDefinition"
+          "ecs:DescribeTaskDefinition",
+          "ecs:ListTasks" # Added the missing permission that crashed your DAG
         ]
-
-        Resource = "*"
+        # Locked down to your specific account, region, and cluster
+        Resource = [
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/pipeout-cluster",
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/*",
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task/pipeout-cluster/*"
+        ]
       },
       {
         Effect = "Allow"
-
-        Action = [
-          "iam:PassRole"
+        Action = "iam:PassRole"
+        # SECURITY FIX: Airflow can ONLY pass the exact execution and task roles created above. No wildcards.
+        Resource = [
+          aws_iam_role.ecs_execution.arn,
+          aws_iam_role.ecs_task.arn
         ]
-
-        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:GetLogEvents"
+        ]
+        # Required so the Airflow UI can stream the callee container's CloudWatch logs
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
       }
     ]
   })
