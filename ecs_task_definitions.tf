@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "model_training" {
   cpu                      = var.model_training_cpu
   memory                   = var.model_training_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
-  task_role_arn            = aws.iam.role.model_training_task_role.arn
+  task_role_arn            = aws_iam_role.model_training_task_role.arn
   container_definitions = jsonencode([
     {
       environment = [
