@@ -87,7 +87,8 @@ resource "aws_iam_role_policy" "airflow_ecs_policy" {
         Resource = [
           aws_iam_role.ecs_execution.arn,
           aws_iam_role.ecs_task.arn,
-          aws_iam_role.feature_engineering_task_role.arn
+          aws_iam_role.feature_engineering_task_role.arn,
+          aws_iam_role.model_training_task_role.arn
         ]
       },
       {
