@@ -20,7 +20,7 @@ resource "aws_db_subnet_group" "mlflow_db_subnet" {
 resource "aws_db_instance" "mlflow_db" {
   identifier        = "mlflow-backend-db"
   engine            = "postgres"
-  engine_version    = "15.4"
+  engine_version    = "15"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
 
