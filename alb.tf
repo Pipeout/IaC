@@ -59,6 +59,18 @@ output "mlflow_url" {
 }
 
 
+
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 80
+  protocol          = "HTTP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.airflow.arn
+  }
+}
+
 resource "aws_security_group" "mlflow_alb_sg" {
   name        = "mlflow-dedicated-alb-sg"
   description = "Allow inbound web traffic to MLflow ALB"
