@@ -116,6 +116,16 @@ resource "aws_ecs_task_definition" "mlflow" {
       name      = "mlflow"
       image     = "${aws_ecr_repository.mlflow.repository_url}:latest"
       essential = true
+      environment = [
+        {
+          name  = "BACKEND_STORE_URI"
+          value = "postgresql://${aws_db_instance.mlflow_db.username}:${aws_db_instance.mlflow_db.password}@${aws_db_instance.mlflow_db.endpoint}/${aws_db_instance.mlflow_db.db_name}"
+        },
+        {
+          name  = "DEFAULT_ARTIFACT_ROOT"
+          value = "s3://${var.pipeout_bucket_name}"
+        }
+      ]
       portMappings = [
         { containerPort = var.mlflow_port } # was missing entirely
       ]

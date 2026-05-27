@@ -26,11 +26,11 @@ variable "airflow_image" {
 }
 
 variable "model_training_cpu" {
-  default = 512
+  default = 2048
 }
 
 variable "model_training_memory" {
-  default = 1024
+  default = 4096
 }
 
 variable "model_training_image" {
@@ -54,11 +54,11 @@ variable "mlflow_port" {
 }
 
 variable "mlflow_cpu" {
-  default = 256
+  default = 1024
 }
 
 variable "mlflow_memory" {
-  default = 512
+  default = 2048
 }
 
 variable "mlflow_image" {
