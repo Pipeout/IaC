@@ -57,9 +57,6 @@ resource "aws_iam_role" "airflow_task_role" {
   })
 }
 
-# ------------------------------------------------------------------------------
-# 4. AIRFLOW OPERATOR POLICY (The Security Fix)
-# ------------------------------------------------------------------------------
 resource "aws_iam_role_policy" "airflow_ecs_policy" {
   name = "airflow-ecs-policy"
   role = aws_iam_role.airflow_task_role.id
@@ -121,6 +118,51 @@ resource "aws_iam_role" "feature_engineering_task_role" {
 resource "aws_iam_role_policy" "feature_engineering_s3_access" {
   name = "feature-engineering-s3-access"
   role = aws_iam_role.feature_engineering_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}
+
+
+
+resource "aws_iam_role" "model_training_task_role" {
+  name = "model-training-task-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "model_training_s3_access" {
+  name = "model-training-s3-access"
+  role = aws_iam_role.model_training_task_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
