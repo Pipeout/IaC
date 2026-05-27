@@ -7,7 +7,7 @@ resource "aws_ecs_task_definition" "airflow" {
   cpu                      = var.airflow_cpu
   memory                   = var.airflow_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
-  task_role_arn            = aws_iam_role.airflow_task_role.arn
+  # task_role_arn            = aws_iam_role.airflow_task_role.arn
   container_definitions = jsonencode([
     {
       name      = "airflow"
