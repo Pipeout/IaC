@@ -33,11 +33,10 @@ resource "aws_lb_target_group" "airflow" {
   port        = var.airflow_ui_port
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
-  target_type = "ip" # required for Fargate
+  target_type = "ip"
 
   health_check {
-    path = "/"
-    # path                = "/api/v2/monitor/health"
+    path                = "/"
     port                = var.airflow_ui_port
     protocol            = "HTTP"
     healthy_threshold   = 2
@@ -50,61 +49,70 @@ resource "aws_lb_target_group" "airflow" {
   tags = { Name = "airflow-tg" }
 }
 
-resource "aws_lb_target_group" "mlflow" {
-  name        = "mlflow-tg"
-  port        = var.mlflow_port
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip" # required for Fargate
-
-  health_check {
-    path                = "/health"
-    port                = var.mlflow_port
-    protocol            = "HTTP"
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-    interval            = 30
-    timeout             = 5
-    matcher             = "200"
-  }
-
-  tags = { Name = "mlflow-tg" }
-}
-
-
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.main.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.airflow.arn
-  }
-}
-
-
-# Route /mlflow* → MLflow target group
-resource "aws_lb_listener_rule" "mlflow" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 200
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.mlflow.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/mlflow*"]
-    }
-  }
-}
 
 output "airflow_url" {
   value = "http://${aws_lb.main.dns_name}"
 }
 
 output "mlflow_url" {
-  value = "http://${aws_lb.main.dns_name}/mlflow"
+  value = "http://${aws_lb.mlflow_alb.dns_name}"
+}
+
+
+resource "aws_security_group" "mlflow_alb_sg" {
+  name        = "mlflow-dedicated-alb-sg"
+  description = "Allow inbound web traffic to MLflow ALB"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# 2. The Dedicated Application Load Balancer
+resource "aws_lb" "mlflow_alb" {
+  name               = "mlflow-dedicated-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.mlflow_alb_sg.id]
+  subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+}
+
+resource "aws_lb_target_group" "mlflow_tg" {
+  name        = "mlflow-target-group"
+  port        = 5000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip" # Required for Fargate
+
+  health_check {
+    path                = "/ping" # MLflow has a native /ping endpoint that returns 200 OK
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 4
+  }
+}
+
+resource "aws_lb_listener" "mlflow_listener" {
+  load_balancer_arn = aws_lb.mlflow_alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.mlflow_tg.arn
+  }
 }

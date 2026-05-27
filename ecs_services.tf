@@ -11,7 +11,6 @@ resource "aws_ecs_service" "airflow" {
     assign_public_ip = true
   }
 
-  # Wire to ALB target group
   load_balancer {
     target_group_arn = aws_lb_target_group.airflow.arn
     container_name   = "airflow"
@@ -35,7 +34,7 @@ resource "aws_ecs_service" "mlflow" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.mlflow.arn
+    target_group_arn = aws_lb_target_group.mlflow_tg.arn
     container_name   = "mlflow"
     container_port   = var.mlflow_port
   }

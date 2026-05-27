@@ -53,7 +53,7 @@ resource "aws_ecs_task_definition" "model_training" {
       environment = [
         {
           name  = "MLFLOW_TRACKING_URI",
-          value = "http://${aws_lb.main.dns_name}/mlflow"
+          value = "http://${aws_lb.mlflow_alb.dns_name}"
         },
         {
           name  = "ECS_TARGET_SUBNETS"
