@@ -71,6 +71,7 @@ resource "aws_ecs_task_definition" "feature_engineering" {
   cpu                      = var.feature_engineering_cpu
   memory                   = var.feature_engineering_memory
   execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.feature_engineering_task_role.arn
   container_definitions = jsonencode([
     {
       name      = "feature_engineering"

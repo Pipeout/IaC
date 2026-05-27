@@ -102,3 +102,49 @@ resource "aws_iam_role_policy" "airflow_ecs_policy" {
     ]
   })
 }
+
+
+
+resource "aws_iam_role" "feature_engineering_task_role" {
+  name = "feature-engineering-task-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "feature_engineering_s3_access" {
+  name = "feature-engineering-s3-access"
+  role = aws_iam_role.feature_engineering_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        # Bucket-level permission
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject" # Include this if your script cleans up or drops old data
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}
