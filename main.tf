@@ -18,3 +18,9 @@ resource "aws_cloudwatch_log_group" "feature_engineering" {
   name              = "/ecs/feature_engineering"
   retention_in_days = 7
 }
+
+
+resource "aws_cloudwatch_log_group" "preprocessing" {
+  name              = "/ecs/preprocessing"
+  retention_in_days = 7
+}
