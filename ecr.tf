@@ -13,3 +13,7 @@ resource "aws_ecr_repository" "airflow" {
 resource "aws_ecr_repository" "mlflow" {
   name = var.mlflow_image
 }
+
+resource "aws_ecr_repository" "preprocessing" {
+  name = var.preprocessing_image
+}

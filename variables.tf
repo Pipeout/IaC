@@ -64,3 +64,16 @@ variable "mlflow_memory" {
 variable "mlflow_image" {
   type = string
 }
+
+
+variable "preprocessing_cpu" {
+  default = 2048
+}
+
+variable "preprocessing_memory" {
+  default = 4096
+}
+
+variable "preprocessing_image" {
+  type = string
+}

@@ -148,3 +148,30 @@ resource "aws_ecs_task_definition" "mlflow" {
     }
   ])
 }
+
+
+
+resource "aws_ecs_task_definition" "preprocessing" {
+  family                   = "preprocessing"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = var.preprocessing_cpu
+  memory                   = var.preprocessing_memory
+  execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.preprocessing_task_role.arn
+  container_definitions = jsonencode([
+    {
+      name      = "preprocessing"
+      image     = "${aws_ecr_repository.preprocessing.repository_url}:latest"
+      essential = true
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = "/ecs/preprocessing"
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    }
+  ])
+}

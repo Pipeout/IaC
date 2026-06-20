@@ -76,8 +76,6 @@ resource "aws_iam_role_policy" "airflow_ecs_policy" {
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/pipeout-cluster",
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task-definition/*",
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task/pipeout-cluster/*",
-
-          # THE MISSING PIECE:
           "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:container-instance/pipeout-cluster/*"
         ]
       },
@@ -88,7 +86,8 @@ resource "aws_iam_role_policy" "airflow_ecs_policy" {
           aws_iam_role.ecs_execution.arn,
           aws_iam_role.ecs_task.arn,
           aws_iam_role.feature_engineering_task_role.arn,
-          aws_iam_role.model_training_task_role.arn
+          aws_iam_role.model_training_task_role.arn,
+          aws_iam_role.preprocessing_task_role.arn
         ]
       },
       {
@@ -211,6 +210,50 @@ resource "aws_iam_role" "mlflow_task_role" {
 resource "aws_iam_role_policy" "mlflow_s3_access" {
   name = "mlflow-s3-access"
   role = aws_iam_role.mlflow_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.pipeout_bucket_name}/*"
+        ]
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role" "preprocessing_task_role" {
+  name = "preprocessing-task-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "preprocessing_s3_access" {
+  name = "preprocessing-s3-access"
+  role = aws_iam_role.preprocessing_task_role.id
 
   policy = jsonencode({
     Version = "2012-10-17"
