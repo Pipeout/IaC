@@ -105,7 +105,7 @@ resource "aws_lb_target_group" "mlflow_tg" {
   target_type = "ip" # Required for Fargate
 
   health_check {
-    path                = "/ping" # MLflow has a native /ping endpoint that returns 200 OK
+    path                = "/" # MLflow has a native /ping endpoint that returns 200 OK
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30
