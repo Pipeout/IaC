@@ -58,9 +58,6 @@ output "mlflow_url" {
   value = "http://${aws_lb.mlflow_alb.dns_name}"
 }
 
-
-
-
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
@@ -77,8 +74,8 @@ resource "aws_security_group" "mlflow_alb_sg" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -120,7 +117,7 @@ resource "aws_lb_target_group" "mlflow_tg" {
 
 resource "aws_lb_listener" "mlflow_listener" {
   load_balancer_arn = aws_lb.mlflow_alb.arn
-  port              = "80"
+  port              = "5000"
   protocol          = "HTTP"
 
   default_action {

@@ -80,13 +80,13 @@ resource "aws_security_group" "mlflow" {
   tags   = { Name = "mlflow" }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "mlflow" {
-  security_group_id            = aws_security_group.mlflow.id
-  from_port                    = var.mlflow_port
-  to_port                      = var.mlflow_port
-  ip_protocol                  = "tcp"
-  referenced_security_group_id = aws_security_group.alb.id # only ALB can reach MLflow
-}
+# resource "aws_vpc_security_group_ingress_rule" "mlflow" {
+#   security_group_id            = aws_security_group.mlflow.id
+#   from_port                    = var.mlflow_port
+#   to_port                      = var.mlflow_port
+#   ip_protocol                  = "tcp"
+#   referenced_security_group_id = aws_security_group.alb.id # only ALB can reach MLflow
+# }
 
 resource "aws_vpc_security_group_egress_rule" "mlflow" {
   security_group_id = aws_security_group.mlflow.id

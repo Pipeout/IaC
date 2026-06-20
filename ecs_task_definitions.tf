@@ -51,9 +51,11 @@ resource "aws_ecs_task_definition" "model_training" {
   container_definitions = jsonencode([
     {
       environment = [
+
+
         {
           name  = "MLFLOW_TRACKING_URI",
-          value = "http://${aws_lb.mlflow_alb.dns_name}"
+          value = "http://${aws_lb.mlflow_alb.dns_name}:5000"
         },
         {
           name  = "ECS_TARGET_SUBNETS"
