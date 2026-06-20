@@ -3,10 +3,11 @@ resource "aws_security_group" "rds_mlflow" {
   vpc_id = aws_vpc.main.id # Assumes your VPC resource is named aws_vpc.main
 
   ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ephemeral.id]
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    # only trust the mlflow service
+    security_groups = [aws_security_group.mlflow.id]
   }
 
   tags = { Name = "rds-mlflow-sg" }

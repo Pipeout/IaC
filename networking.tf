@@ -80,14 +80,27 @@ resource "aws_security_group" "mlflow" {
   tags   = { Name = "mlflow" }
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "mlflow" {
-#   security_group_id            = aws_security_group.mlflow.id
-#   from_port                    = var.mlflow_port
-#   to_port                      = var.mlflow_port
-#   ip_protocol                  = "tcp"
-#   referenced_security_group_id = aws_security_group.alb.id # only ALB can reach MLflow
-# }
+# 1. The UI Route: Allow your Load Balancer to reach the MLflow UI
+resource "aws_vpc_security_group_ingress_rule" "mlflow_from_alb" {
+  security_group_id            = aws_security_group.mlflow.id
+  from_port                    = var.mlflow_port
+  to_port                      = var.mlflow_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.alb.id
+}
 
+# 2. The Training Route: Allow your Ephemeral Training tasks to log metrics to MLflow
+resource "aws_vpc_security_group_ingress_rule" "mlflow_from_ephemeral" {
+  security_group_id = aws_security_group.mlflow.id
+  from_port         = var.mlflow_port
+  to_port           = var.mlflow_port
+  ip_protocol       = "tcp"
+  # Assuming your ephemeral service uses a security group named 'aws_security_group.ephemeral'
+  referenced_security_group_id = aws_security_group.ephemeral.id
+}
+
+# Outbound route: Wide open. This allows MLflow to reach the RDS database on port 5432
+# and the internet to download python packages if necessary.
 resource "aws_vpc_security_group_egress_rule" "mlflow" {
   security_group_id = aws_security_group.mlflow.id
   ip_protocol       = "-1"

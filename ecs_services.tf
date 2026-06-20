@@ -29,7 +29,7 @@ resource "aws_ecs_service" "mlflow" {
 
   network_configuration {
     subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
-    security_groups  = [aws_security_group.mlflow.id]
+    security_groups  = [aws_security_group.mlflow.id, aws_security_group.ephemeral.id]
     assign_public_ip = true
   }
 
