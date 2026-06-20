@@ -54,11 +54,11 @@ variable "mlflow_port" {
 }
 
 variable "mlflow_cpu" {
-  default = 1024
+  default = 2048
 }
 
 variable "mlflow_memory" {
-  default = 2048
+  default = 4096
 }
 
 variable "mlflow_image" {
